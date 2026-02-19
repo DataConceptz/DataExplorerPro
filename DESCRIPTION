@@ -1,0 +1,47 @@
+Package: DataExplorerPro
+Type: Package
+Title: AI-Powered Data Exploration Studio for RStudio
+Version: 1.0.0
+Date: 2026-01-27
+Author: Gideon Alake
+Maintainer: Gideon Alake <polcollino@gmail.com>
+URL: https://github.com/DataConceptz/DataExplorerPro
+BugReports: https://github.com/DataConceptz/DataExplorerPro/issues
+Description: 
+    An RStudio add-in that provides an interactive, AI-powered data exploration 
+    environment. Automatically generates comprehensive EDA reports, intelligent 
+    visualizations, and natural language queries using Ollama models.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    shiny,
+    plotly,
+    dplyr,
+    tidyr,
+    ggplot2,
+    skimr,
+    DT,
+    jsonlite,
+    httr,
+    glue,
+    purrr,
+    stringr,
+    lubridate,
+    scales,
+    htmltools,
+    bslib,
+    gargoyle,
+    gapminder,
+    writexl,
+    htmlwidgets,
+    igraph,
+    visNetwork,
+    networkD3,
+    rlang
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown,
+    webshot2
+RoxygenNote: 7.2.3

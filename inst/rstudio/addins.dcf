@@ -1,0 +1,3 @@
+Name: DataExplorerPro
+Description: AI-Powered Data Exploration Studio for RStudio. Automatically generates EDA reports, visualizations, and allows natural language queries using Ollama.
+Interactive: true

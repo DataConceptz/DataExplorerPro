@@ -1,0 +1,12 @@
+^\.github$
+^docs$
+^LICENSE\.md$
+^CONTRIBUTING\.md$
+^CODE_OF_CONDUCT\.md$
+^SECURITY\.md$
+^CHANGELOG\.md$
+^TODO_FIXES\.md$
+^install\.R$
+^\.gitignore$
+^.*\.Rproj$
+^\.Rproj\.user$

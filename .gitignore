@@ -1,0 +1,47 @@
+# R package files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Build artifacts
+*.tar.gz
+*.zip
+src/*.o
+src/*.so
+src/*.dll
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+nul
+
+# Test artifacts
+tests/testthat/_snaps/
+
+# Generated HTML docs
+docs/*.html
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+.Renviron
+
+# Shiny
+shiny_log/
+
+# Development notes
+TODO_FIXES.md
