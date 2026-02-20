@@ -17,49 +17,6 @@
 #' @aliases DataExplorerPro-package
 NULL
 
-#' Launch DataExplorerPro Add-in
-#'
-#' Opens the interactive data exploration studio in a new RStudio viewer pane or window.
-#'
-#' @param ... Additional arguments passed to shiny::runApp
-#'
-#' @return Invisibly returns NULL
-#'
-#' @examples
-#' \dontrun{
-#' # Launch the add-in
-#' run_app()
-#' }
-#'
-#' @export
-run_app <- function(...) {
-
-  app_dir <- system.file("app", package = "DataExplorerPro")
-
-  if (!nzchar(app_dir) || !dir.exists(app_dir)) {
-    dev_path <- file.path(getwd(), "inst", "app")
-    if (dir.exists(dev_path)) app_dir <- dev_path
-  }
-
-  if (!nzchar(app_dir) || !dir.exists(app_dir)) {
-    stop("Could not find app directory. Please reinstall the package:\n",
-         '  remotes::install_github("DataConceptz/DataExplorerPro")')
-  }
-
-  message("Launching DataExplorerPro from: ", app_dir)
-  shiny::runApp(appDir = app_dir, ...)
-}
-
-#' DataExplorerPro Add-in
-#'
-#' This function is called by RStudio when the add-in is invoked.
-#' It launches the DataExplorerPro interface.
-#'
-#' @export
-addin <- function() {
-  run_app()
-}
-
 #' Query Data Using Natural Language
 #'
 #' Converts a natural language query into R code and executes it.

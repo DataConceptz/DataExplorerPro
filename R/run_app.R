@@ -31,9 +31,15 @@ run_app <- function(...) {
 
   message("Launching DataExplorerPro from: ", app_dir)
 
-  # Let Shiny/RStudio decide the best launch target (viewer vs browser)
-  # and networking defaults for the current environment.
-  shiny::runApp(appDir = app_dir, ...)
+  # Use environment-aware defaults. In hosted environments (e.g., Posit Cloud),
+  # host must be 0.0.0.0 for the proxy to connect.
+  host <- getOption("shiny.host", "0.0.0.0")
+  port <- getOption("shiny.port")
+
+  run_args <- list(appDir = app_dir, host = host, ...)
+  if (!is.null(port)) run_args$port <- port
+
+  do.call(shiny::runApp, run_args)
 }
 
 #' DataExplorerPro Add-in
