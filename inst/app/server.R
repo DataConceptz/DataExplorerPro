@@ -1,6 +1,7 @@
 # DataExplorerPro Server Logic
 # AI-Powered Data Exploration Studio
 
+library(DataExplorerPro)
 library(shiny)
 library(dplyr)
 library(tidyr)
