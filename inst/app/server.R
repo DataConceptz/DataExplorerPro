@@ -1509,14 +1509,6 @@ server <- function(input, output, session) {
       global_data$original_data <- data
       global_data$transformed_data <- data
 
-      # Refresh Ask-tab sample questions with dataset-aware suggestions
-      updateSelectInput(
-        session,
-        "sample_nlp_query",
-        choices = build_context_aware_sample_questions(data),
-        selected = ""
-      )
-      
       # Show success message
       showNotification("Data loaded successfully!", type = "message")
       
@@ -1537,6 +1529,7 @@ server <- function(input, output, session) {
   # Reactive update of sample questions when data changes
   observe({
     req(global_data$data)
+    showNotification("Sample questions updated for new data", type = "message")
     tryCatch({
       updateSelectInput(session, "sample_nlp_query", choices = build_context_aware_sample_questions(global_data$data), selected = "")
     }, error = function(e) {
