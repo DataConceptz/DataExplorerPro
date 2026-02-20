@@ -21,97 +21,33 @@ NULL
 #'
 #' Opens the interactive data exploration studio in a new RStudio viewer pane or window.
 #'
-#' @param port Port for Shiny server (default: 5050)
-#' @param host Host address (default: 127.0.0.1)
-#' @param browser Whether to open in external browser (default: FALSE)
-#' @param theme Bootstrap theme (default: bslib::bs_theme(bootswatch = "cosmo"))
-#' @param ... Additional arguments passed to shiny::shinyApp
+#' @param ... Additional arguments passed to shiny::runApp
 #'
-#' @return Shiny app object
+#' @return Invisibly returns NULL
 #'
 #' @examples
 #' \dontrun{
 #' # Launch the add-in
 #' run_app()
-#'
-#' # Launch in external browser
-#' run_app(browser = TRUE)
-#'
-#' # Launch with custom theme
-#' library(bslib)
-#' run_app(theme = bs_theme(bootswatch = "flatly"))
 #' }
 #'
 #' @export
-run_app <- function(port = 5050, host = "127.0.0.1", browser = FALSE, 
-                    theme = NULL, ...) {
-  
-  # Check if required packages are installed
-  required_packages <- c(
-    "shiny", "plotly", "dplyr", "tidyr", "ggplot2", 
-    "skimr", "DT", "jsonlite", "httr", "glue",
-    "purrr", "stringr", "lubridate", "scales", 
-    "htmltools", "bslib", "gargoyle", "shinyjs",
-    "readxl", "arrow", "RColorBrewer"
-  )
-  
-  missing_packages <- required_packages[!required_packages %in% rownames(installed.packages())]
-  if (length(missing_packages) > 0) {
-    message("Installing missing packages: ", paste(missing_packages, collapse = ", "))
-    install.packages(missing_packages, repos = "https://cloud.r-project.org", quiet = TRUE)
+run_app <- function(...) {
+
+  app_dir <- system.file("app", package = "DataExplorerPro")
+
+  if (!nzchar(app_dir) || !dir.exists(app_dir)) {
+    dev_path <- file.path(getwd(), "inst", "app")
+    if (dir.exists(dev_path)) app_dir <- dev_path
   }
-  
-  # Load required packages
-  suppressPackageStartupMessages({
-    lapply(required_packages, library, character.only = TRUE)
-  })
-  
-  # Source all R files in the package
-  r_files <- list.files(system.file("R", package = "DataExplorerPro"), 
-                        pattern = "\\.R$", full.names = TRUE)
-  lapply(r_files, source)
-  
-  # Get app files
-  ui_file <- system.file("app/ui.R", package = "DataExplorerPro")
-  server_file <- system.file("app/server.R", package = "DataExplorerPro")
-  
-  if (!file.exists(ui_file) || !file.exists(server_file)) {
-    stop("App files not found. Please reinstall the package.")
+
+  if (!nzchar(app_dir) || !dir.exists(app_dir)) {
+    stop("Could not find app directory. Please reinstall the package:\n",
+         '  remotes::install_github("DataConceptz/DataExplorerPro")')
   }
-  
-  # Source app files
-  source(ui_file, local = TRUE)
-  source(server_file, local = TRUE)
-  
-  # Set default theme if not provided
-  if (is.null(theme)) {
-    theme <- bslib::bs_theme(version = 5, bootswatch = "cosmo")
-  }
-  
-  # Create the app
-  app <- shinyApp(ui = ui, server = server)
-  
-  # Launch the app
-  if (browser) {
-    shiny::runApp(app, host = host, port = port, launch.browser = TRUE)
-  } else {
-    # Try to open in RStudio Viewer
-    tryCatch({
-      viewer <- getOption("viewer")
-      if (!is.null(viewer) && interactive()) {
-        message("Opening DataExplorerPro in RStudio Viewer...")
-        viewer(paste0("http://", host, ":", port))
-        shiny::runApp(app, host = host, port = port, launch.browser = FALSE)
-      } else {
-        shiny::runApp(app, host = host, port = port, launch.browser = TRUE)
-      }
-    }, error = function(e) {
-      message("Could not open in RStudio Viewer. Opening in browser instead.")
-      shiny::runApp(app, host = host, port = port, launch.browser = TRUE)
-    })
-  }
-  
-  return(invisible(app))
+
+  message("Launching DataExplorerPro from: ", app_dir)
+  shiny::runApp(appDir = app_dir, ...)
 }
 
 #' DataExplorerPro Add-in

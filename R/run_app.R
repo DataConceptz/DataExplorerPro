@@ -31,9 +31,9 @@ run_app <- function(...) {
 
   message("Launching DataExplorerPro from: ", app_dir)
 
-  # Let Shiny handle host, port, and browser/viewer automatically.
-  # This works on local RStudio, Posit Cloud, and RStudio Server.
-  shiny::runApp(appDir = app_dir, launch.browser = TRUE, ...)
+  # Let Shiny/RStudio decide the best launch target (viewer vs browser)
+  # and networking defaults for the current environment.
+  shiny::runApp(appDir = app_dir, ...)
 }
 
 #' DataExplorerPro Add-in
