@@ -6,7 +6,7 @@ empty_plot_message <- function(msg) {
   plotly::plot_ly(
     x = 0, y = 0, type = "scatter", mode = "markers",
     marker = list(opacity = 0), showlegend = FALSE, hoverinfo = "skip"
-  ) %>% layout(
+  ) %>% plotly::layout(
     annotations = list(list(
       text = msg, x = 0.5, y = 0.5, xref = "paper", yref = "paper",
       showarrow = FALSE
@@ -32,16 +32,18 @@ create_scatter_plot <- function(data, x_var, y_var, color_var = NULL,
                                 size_var = NULL, trendline = FALSE, 
                                 title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), y = ~get(y_var), 
-               type = "scatter", mode = "markers")
+  p <- plotly::plot_ly(data, x = ~get(x_var), y = ~get(y_var), 
+                       type = "scatter", mode = "markers")
   
   if (!is.null(color_var) && color_var != "") {
-    p <- p %>% add_markers(color = ~get(color_var),
-                          marker = list(size = if(!is.null(size_var) && size_var != "") {
-                            ~get(size_var) * 2
-                          } else 10))
+    p <- p %>% plotly::add_markers(
+      color = ~get(color_var),
+      marker = list(size = if (!is.null(size_var) && size_var != "") {
+        ~get(size_var) * 2
+      } else 10)
+    )
   } else {
-    p <- p %>% add_markers(marker = list(
+    p <- p %>% plotly::add_markers(marker = list(
       size = if(!is.null(size_var) && size_var != "") {
         ~get(size_var) * 2
       } else 10,
@@ -51,11 +53,13 @@ create_scatter_plot <- function(data, x_var, y_var, color_var = NULL,
   }
   
   if (trendline) {
-    p <- p %>% add_lines(y = ~fitted(lm(get(y_var) ~ get(x_var))),
-                        line = list(color = "#764ba2", dash = "dash"))
+    p <- p %>% plotly::add_lines(
+      y = ~fitted(lm(get(y_var) ~ get(x_var))),
+      line = list(color = "#764ba2", dash = "dash")
+    )
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Scatter Plot:", x_var, "vs", y_var),
     xaxis = list(title = x_var),
     yaxis = list(title = y_var),
@@ -71,16 +75,16 @@ create_scatter_plot <- function(data, x_var, y_var, color_var = NULL,
 create_line_chart <- function(data, x_var, y_var, color_var = NULL, 
                              facet_var = NULL, title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), y = ~get(y_var), 
-               type = "scatter", mode = "lines")
+  p <- plotly::plot_ly(data, x = ~get(x_var), y = ~get(y_var), 
+                       type = "scatter", mode = "lines")
   
   if (!is.null(color_var) && color_var != "") {
-    p <- p %>% add_lines(color = ~get(color_var))
+    p <- p %>% plotly::add_lines(color = ~get(color_var))
   } else {
-    p <- p %>% add_lines(line = list(color = "#667eea", width = 2))
+    p <- p %>% plotly::add_lines(line = list(color = "#667eea", width = 2))
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Line Chart:", y_var, "over", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = y_var)
@@ -102,24 +106,35 @@ create_bar_chart <- function(data, x_var, y_var, color_var = NULL,
 
   if (!is.null(y_var) && y_var != "" && is.numeric(data[[y_var]])) {
     agg_data <- data %>%
-      group_by(across(all_of(group_vars))) %>%
-      summarize(value = mean(.data[[y_var]], na.rm = TRUE), .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+      dplyr::summarize(value = mean(.data[[y_var]], na.rm = TRUE), .groups = "drop")
     y_title <- paste("Mean", y_var)
   } else {
     agg_data <- data %>%
-      group_by(across(all_of(group_vars))) %>%
-      summarize(value = n(), .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+      dplyr::summarize(value = dplyr::n(), .groups = "drop")
     y_title <- "Count"
   }
 
   if (!is.null(color_var) && color_var != "") {
-    p <- plot_ly(agg_data, x = ~get(x_var), y = ~value, color = ~get(color_var), type = "bar")
+    p <- plotly::plot_ly(
+      agg_data,
+      x = ~get(x_var),
+      y = ~value,
+      color = ~get(color_var),
+      type = "bar"
+    )
   } else {
-    p <- plot_ly(agg_data, x = ~get(x_var), y = ~value, type = "bar",
-                 marker = list(color = "#667eea"))
+    p <- plotly::plot_ly(
+      agg_data,
+      x = ~get(x_var),
+      y = ~value,
+      type = "bar",
+      marker = list(color = "#667eea")
+    )
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Bar Chart:", y_title, "by", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = y_title),
@@ -135,17 +150,26 @@ create_bar_chart <- function(data, x_var, y_var, color_var = NULL,
 create_histogram <- function(data, x_var, color_var = NULL, bins = 30, 
                             title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), type = "histogram",
-              nbinsx = bins,
-              marker = list(color = "#667eea", opacity = 0.7))
+  p <- plotly::plot_ly(
+    data,
+    x = ~get(x_var),
+    type = "histogram",
+    nbinsx = bins,
+    marker = list(color = "#667eea", opacity = 0.7)
+  )
   
   if (!is.null(color_var) && color_var != "") {
-    p <- plot_ly(data, x = ~get(x_var), color = ~get(color_var),
-                type = "histogram", nbinsx = bins) %>%
-      layout(barmode = "overlay")
+    p <- plotly::plot_ly(
+      data,
+      x = ~get(x_var),
+      color = ~get(color_var),
+      type = "histogram",
+      nbinsx = bins
+    ) %>%
+      plotly::layout(barmode = "overlay")
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Histogram of", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = "Count")
@@ -160,13 +184,13 @@ create_histogram <- function(data, x_var, color_var = NULL, bins = 30,
 create_box_plot <- function(data, x_var, y_var, color_var = NULL, 
                            title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), y = ~get(y_var), type = "box")
+  p <- plotly::plot_ly(data, x = ~get(x_var), y = ~get(y_var), type = "box")
   
   if (!is.null(color_var) && color_var != "") {
-    p <- p %>% add_trace(boxpoints = "all", jitter = 0.3, pointpos = -1.8)
+    p <- p %>% plotly::add_trace(boxpoints = "all", jitter = 0.3, pointpos = -1.8)
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Box Plot:", y_var, "by", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = y_var)
@@ -181,15 +205,20 @@ create_box_plot <- function(data, x_var, y_var, color_var = NULL,
 create_violin_plot <- function(data, x_var, y_var, color_var = NULL, 
                               title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), y = ~get(y_var), type = "violin",
-              box = list(visible = TRUE), 
-              meanline = list(visible = TRUE))
+  p <- plotly::plot_ly(
+    data,
+    x = ~get(x_var),
+    y = ~get(y_var),
+    type = "violin",
+    box = list(visible = TRUE),
+    meanline = list(visible = TRUE)
+  )
   
   if (!is.null(color_var) && color_var != "") {
-    p <- p %>% add_trace(split = ~get(color_var))
+    p <- p %>% plotly::add_trace(split = ~get(color_var))
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Violin Plot:", y_var, "by", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = y_var)
@@ -209,19 +238,24 @@ create_heatmap <- function(data, x_var, y_var, value_var = NULL,
   
   if (use_counts) {
     agg_data <- data %>%
-      group_by(!!sym(x_var), !!sym(y_var)) %>%
-      summarize(value = n(), .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(x_var, y_var)))) %>%
+      dplyr::summarize(value = dplyr::n(), .groups = "drop")
   } else {
     agg_data <- data %>%
-      group_by(!!sym(x_var), !!sym(y_var)) %>%
-      summarize(value = match.fun(agg_func)(!!sym(value_var), na.rm = TRUE), 
-                .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(x_var, y_var)))) %>%
+      dplyr::summarize(
+        value = match.fun(agg_func)(.data[[value_var]], na.rm = TRUE),
+        .groups = "drop"
+      )
   }
   
-  plot_ly(agg_data, x = ~get(x_var), y = ~get(y_var), z = ~value, 
-         type = "heatmap",
-         colors = grDevices::colorRampPalette(c("#667eea", "white", "#764ba2"))(10)) %>%
-    layout(
+  plotly::plot_ly(
+    agg_data,
+    x = ~get(x_var), y = ~get(y_var), z = ~value,
+    type = "heatmap",
+    colors = grDevices::colorRampPalette(c("#667eea", "white", "#764ba2"))(10)
+  ) %>%
+    plotly::layout(
       title = title %||% paste("Heatmap:", value_var, "by", x_var, "and", y_var),
       xaxis = list(title = x_var),
       yaxis = list(title = y_var)
@@ -235,11 +269,15 @@ create_heatmap <- function(data, x_var, y_var, value_var = NULL,
 #' @export
 create_density_plot <- function(data, x_var, color_var = NULL, title = NULL) {
   
-  p <- plot_ly(data, x = ~get(x_var), type = "histogram", 
-              histnorm = "probability density",
-              marker = list(color = "#667eea", opacity = 0.7))
+  p <- plotly::plot_ly(
+    data,
+    x = ~get(x_var),
+    type = "histogram",
+    histnorm = "probability density",
+    marker = list(color = "#667eea", opacity = 0.7)
+  )
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("Density Plot of", x_var),
     xaxis = list(title = x_var),
     yaxis = list(title = "Density")
@@ -256,12 +294,12 @@ create_pie_chart <- function(data, category_var, value_var = NULL,
   
   if (is.null(value_var) || !nzchar(value_var)) {
     agg_data <- data %>%
-      group_by(!!sym(category_var)) %>%
-      summarize(value = n(), .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(category_var))) %>%
+      dplyr::summarize(value = dplyr::n(), .groups = "drop")
   } else {
     agg_data <- data %>%
-      group_by(!!sym(category_var)) %>%
-      summarize(value = sum(!!sym(value_var), na.rm = TRUE), .groups = "drop")
+      dplyr::group_by(dplyr::across(dplyr::all_of(category_var))) %>%
+      dplyr::summarize(value = sum(.data[[value_var]], na.rm = TRUE), .groups = "drop")
   }
   
   colors <- if (requireNamespace("RColorBrewer", quietly = TRUE)) {
@@ -270,10 +308,14 @@ create_pie_chart <- function(data, category_var, value_var = NULL,
     c("#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3")
   }
   
-  plot_ly(agg_data, labels = ~get(category_var), values = ~value, 
-         type = "pie",
-         marker = list(colors = colors)) %>%
-    layout(
+  plotly::plot_ly(
+    agg_data,
+    labels = ~get(category_var),
+    values = ~value,
+    type = "pie",
+    marker = list(colors = colors)
+  ) %>%
+    plotly::layout(
       title = title %||% paste("Distribution of", category_var)
     )
 }
@@ -291,16 +333,19 @@ create_3d_scatter <- function(data, x_var, y_var, z_var = NULL,
     z_var <- numeric_cols[3] %||% y_var
   }
   
-  p <- plot_ly(data, x = ~get(x_var), y = ~get(y_var), z = ~get(z_var), 
-              type = "scatter3d", mode = "markers")
+  p <- plotly::plot_ly(
+    data,
+    x = ~get(x_var), y = ~get(y_var), z = ~get(z_var),
+    type = "scatter3d", mode = "markers"
+  )
   
   if (!is.null(color_var) && color_var != "") {
-    p <- p %>% add_trace(marker = list(color = ~get(color_var)))
+    p <- p %>% plotly::add_trace(marker = list(color = ~get(color_var)))
   } else {
-    p <- p %>% add_trace(marker = list(color = "#667eea"))
+    p <- p %>% plotly::add_trace(marker = list(color = "#667eea"))
   }
   
-  p %>% layout(
+  p %>% plotly::layout(
     title = title %||% paste("3D Scatter:", x_var, ",", y_var, ",", z_var),
     scene = list(
       xaxis = list(title = x_var),
@@ -327,15 +372,17 @@ create_parallel_coords <- function(data, vars = NULL, title = NULL) {
     return(empty_plot_message("Need at least 2 numeric variables for parallel coordinates"))
   }
   
-  plot_ly(type = "parcoords",
-          dimensions = lapply(names(numeric_data), function(col) {
-            list(
-              label = col,
-              values = ~get(col)
-            )
-          }),
-          data = data) %>%
-    layout(
+  plotly::plot_ly(
+    type = "parcoords",
+    dimensions = lapply(names(numeric_data), function(col) {
+      list(
+        label = col,
+        values = ~get(col)
+      )
+    }),
+    data = data
+  ) %>%
+    plotly::layout(
       title = title %||% "Parallel Coordinates Plot"
     )
 }
@@ -362,11 +409,13 @@ create_radar_chart <- function(data, vars = NULL, group_var = NULL,
   if (is.null(group_var)) {
     # Single radar chart for first row
     row_data <- as.numeric(numeric_data[1, ])
-    plot_ly(type = "scatterpolar", r = row_data, 
-            theta = vars, mode = "lines+markers",
-            fill = "toself",
-            marker = list(color = "#667eea")) %>%
-      layout(
+    plotly::plot_ly(
+      type = "scatterpolar", r = row_data,
+      theta = vars, mode = "lines+markers",
+      fill = "toself",
+      marker = list(color = "#667eea")
+    ) %>%
+      plotly::layout(
         polar = list(radialaxis = list(visible = TRUE)),
         title = title %||% paste("Radar Chart:", paste(vars, collapse = ", "))
       )
@@ -386,10 +435,10 @@ create_radar_chart <- function(data, vars = NULL, group_var = NULL,
                     type = "scatter", mode = "markers",
                     marker = list(opacity = 0),
                     showlegend = FALSE, hoverinfo = "skip") %>%
-      add_trace(type = "scatterpolar", r = plot_data[[1]]$r,
-               theta = plot_data[[1]]$theta, mode = "lines+markers",
-               fill = "toself", name = plot_data[[1]]$name) %>%
-      layout(
+      plotly::add_trace(type = "scatterpolar", r = plot_data[[1]]$r,
+                        theta = plot_data[[1]]$theta, mode = "lines+markers",
+                        fill = "toself", name = plot_data[[1]]$name) %>%
+      plotly::layout(
         polar = list(radialaxis = list(visible = TRUE)),
         title = title %||% paste("Radar Chart by", group_var)
       )
@@ -412,10 +461,12 @@ create_correlation_heatmap <- function(data, method = "pearson",
   
   cor_matrix <- cor(numeric_data, use = "complete.obs", method = method)
   
-  plot_ly(x = names(numeric_data), y = names(numeric_data), 
-         z = cor_matrix, type = "heatmap",
-         colors = grDevices::colorRampPalette(c("#667eea", "white", "#764ba2"))(10)) %>%
-    layout(
+  plotly::plot_ly(
+    x = names(numeric_data), y = names(numeric_data),
+    z = cor_matrix, type = "heatmap",
+    colors = grDevices::colorRampPalette(c("#667eea", "white", "#764ba2"))(10)
+  ) %>%
+    plotly::layout(
       title = title %||% paste("Correlation Matrix (", method, ")")
     )
 }
@@ -431,9 +482,9 @@ create_dashboard_grid <- function(plots, ncols = 2, title = NULL) {
     return(empty_plot_message("No plots available to display"))
   }
   
-  subplot(plots, nrows = ceiling(length(plots) / ncols), 
-          shareX = FALSE, shareY = FALSE) %>%
-    layout(
+  plotly::subplot(plots, nrows = ceiling(length(plots) / ncols), 
+                  shareX = FALSE, shareY = FALSE) %>%
+    plotly::layout(
       title = title,
       showlegend = FALSE
     )

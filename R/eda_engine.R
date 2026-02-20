@@ -329,14 +329,34 @@ summarize_data <- function(data) {
 #' Identifies outliers in numeric columns using IQR method.
 #'
 #' @param data A data frame
+#' @param column Optional column name to analyze. If NULL, all numeric columns are analyzed.
 #' @param method Outlier detection method (iqr, zscore)
 #' @param threshold Threshold for detection (default: 1.5 for IQR)
 #' @return List with outlier information
 #'
 #' @export
-detect_outliers <- function(data, method = "iqr", threshold = 1.5) {
+detect_outliers <- function(data, column = NULL, method = "iqr", threshold = 1.5) {
   
-  numeric_cols <- names(data)[sapply(data, is.numeric)]
+  if (!is.data.frame(data)) {
+    stop("Input must be a data frame")
+  }
+
+  if (!is.null(column) && !column %in% names(data)) {
+    stop("Column not found in data")
+  }
+
+  numeric_cols <- if (!is.null(column)) {
+    if (!is.numeric(data[[column]])) {
+      stop("Selected column must be numeric")
+    }
+    column
+  } else {
+    names(data)[sapply(data, is.numeric)]
+  }
+
+  if (length(numeric_cols) == 0) {
+    stop("No numeric columns found")
+  }
   
   outliers <- lapply(numeric_cols, function(col) {
     vals <- data[[col]]
@@ -375,7 +395,11 @@ detect_outliers <- function(data, method = "iqr", threshold = 1.5) {
       )
     }
   })
-  
+
+  if (!is.null(column)) {
+    return(outliers[[1]])
+  }
+
   return(outliers)
 }
 

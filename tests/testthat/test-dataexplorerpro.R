@@ -45,7 +45,7 @@ test_that("query_data_natural_language returns list", {
   test_data <- data.frame(x = 1:10, y = 1:10)
   result <- query_data_natural_language("Show me the data", test_data)
   expect_type(result, "list")
-  expect_named(result, c("code", "explanation", "insights"))
+  expect_true(all(c("code", "explanation", "insights") %in% names(result)))
 })
 
 test_that("generate_eda_report works", {

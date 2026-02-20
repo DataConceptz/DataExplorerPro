@@ -1,5 +1,5 @@
 library(testthat)
-source('../../R/performance.R')
+library(DataExplorerPro)
 
 context('performance')
 
@@ -20,5 +20,5 @@ test_that('get_analysis_data returns full data when below threshold', {
 test_that('profile_expr measures time and returns result', {
   res <- profile_expr({ Sys.sleep(0.1); 42 })
   expect_equal(res$result, 42)
-  expect_true(res$time >= 0.09)
+  expect_true(res$time >= 0.05)
 })

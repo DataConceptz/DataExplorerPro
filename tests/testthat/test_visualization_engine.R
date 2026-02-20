@@ -1,6 +1,5 @@
 library(testthat)
-
-source('../../R/visualization_engine.R')
+library(DataExplorerPro)
 
 context('visualization_engine')
 
