@@ -70,31 +70,18 @@ run_app <- function(port = 5050, host = "127.0.0.1", browser = FALSE, ...) {
   }
   
   message("Loading app files from: ", app_dir)
-  source_files <- list.files(app_dir, pattern = "\\.R$", full.names = TRUE)
-  lapply(source_files, source)
-  
-  # Launch the app
-  app <- shinyApp(ui = ui, server = server)
-  
+
+  # Launch app directly from directory so relative assets in app/www resolve
+  # correctly in installed-package environments.
   if (browser) {
-    shiny::runApp(app, host = host, port = port, launch.browser = TRUE)
+    shiny::runApp(appDir = app_dir, host = host, port = port, launch.browser = TRUE, ...)
   } else {
-    # Try to open in RStudio Viewer
-    tryCatch({
-      viewer <- getOption("viewer")
-      if (!is.null(viewer)) {
-        url <- paste0("http://", host, ":", port)
-        viewer(url)
-      } else {
-        shiny::runApp(app, host = host, port = port)
-      }
-    }, error = function(e) {
-      message("Could not open in RStudio Viewer. Opening in browser instead.")
-      shiny::runApp(app, host = host, port = port, launch.browser = TRUE)
-    })
+    viewer <- getOption("viewer")
+    launch_target <- if (!is.null(viewer) && interactive()) viewer else TRUE
+    shiny::runApp(appDir = app_dir, host = host, port = port, launch.browser = launch_target, ...)
   }
-  
-  return(invisible(app))
+
+  return(invisible(NULL))
 }
 
 #' DataExplorerPro Add-in
