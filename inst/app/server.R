@@ -17,14 +17,8 @@ library(lubridate)
 library(scales)
 library(rlang)
 
-# Load additional R files
-source("../../R/advanced_charts.R")
-source("../../R/eda_engine.R")
-source("../../R/ollama_integration.R")
-source("../../R/visualization_engine.R")
-source("../../R/dashboard_engine.R")
-# source("../../R/network_viz.R")  # Removed - Network tab removed
-source("../../R/performance.R")
+# Functions used below are provided by the DataExplorerPro namespace.
+# Do not source relative ../../R files here: that path is not valid after install.
 
 # Helper function to check Ollama and get models
 check_ollama_status <- function() {
