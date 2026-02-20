@@ -1952,6 +1952,7 @@ server <- function(input, output, session) {
         chart_type,
         x_var, y_var, color_var, size_var, group_var, facet_var,
         input$chart_theme, input$color_palette, input$point_size, input$opacity,
+        input$legend_position,
         nrow(data), ncol(data),
         sep = "|"
       )
@@ -1965,6 +1966,18 @@ server <- function(input, output, session) {
       theme <- input$chart_theme %||% "default"
       point_size <- input$point_size %||% 8
       opacity <- input$opacity %||% 0.7
+      
+      # Legend position
+      legend_pos <- input$legend_position %||% "bottom"
+      legend <- switch(legend_pos,
+        bottom = list(orientation = "h", x = 0, y = -0.2, font = list(size = 11)),
+        top = list(orientation = "h", x = 0, y = 1.1, font = list(size = 11)),
+        right = list(orientation = "v", x = 1.1, y = 0.5, font = list(size = 11)),
+        left = list(orientation = "v", x = -0.3, y = 0.5, font = list(size = 11))
+      )
+      
+      # Font color for dark themes
+      font_color <- if (settings$app_theme %in% c("dark", "cobalt", "solarize")) "#e2e8f0" else "#0f172a"
       
       heatmap_value_var <- if (!is.null(color_var) && color_var != "" && is.numeric(data[[color_var]])) {
         color_var
@@ -2069,6 +2082,8 @@ server <- function(input, output, session) {
       stage <- "layout"
       p <- tryCatch(p %>% layout(
         margin = list(l = 55, r = 20, t = 60, b = 55),
+        font = list(color = font_color),
+        legend = legend,
         hoverlabel = list(bgcolor = "rgba(15, 23, 42, 0.9)", font = list(color = "#f8fafc"))
       ), error = function(e) p)
 
@@ -2149,13 +2164,18 @@ server <- function(input, output, session) {
     list(
       input$chart_type, input$x_var, input$y_var,
       input$color_var, input$size_var, input$group_var, input$facet_var,
-      input$chart_theme, input$color_palette, input$point_size, input$opacity
+      input$chart_theme, input$color_palette, input$point_size, input$opacity,
+      input$legend_position
     )
   })
   observeEvent(shiny::debounce(chart_inputs, 600)(), {
-    if (isTRUE(input$auto_create_chart)) {
-      build_chart(notify = FALSE, insights = FALSE)
-    }
+    tryCatch({
+      if (isTRUE(input$auto_create_chart)) {
+        build_chart(notify = FALSE, insights = FALSE)
+      }
+    }, error = function(e) {
+      showNotification(paste("Error updating chart:", e$message), type = "error")
+    })
   }, ignoreInit = TRUE)
 
   observeEvent(input$expand_chart, {

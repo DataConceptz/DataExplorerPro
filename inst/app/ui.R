@@ -3083,7 +3083,7 @@ ui <- fluidPage(
                   hr(),
                   div(class = "section-title", tags$i(class = "fas fa-paint-brush"), "Style"),
                   selectInput("chart_theme", "Publication Theme:",
-                    choices = c("Default" = "default", "APA" = "apa", "Nature" = "nature", "Science" = "science", "PLOS" = "plos"),
+                    choices = c("Default" = "default", "APA" = "apa", "Nature" = "nature", "Science" = "science", "PLOS" = "plos", "JAMA" = "jama", "Lancet" = "lancet", "IEEE" = "ieee"),
                     selected = "default"
                   ),
                   selectInput("color_palette", "Color Palette:",
@@ -3092,6 +3092,10 @@ ui <- fluidPage(
                   ),
                   numericInput("point_size", "Point Size:", value = 8, min = 1, max = 30, step = 1),
                   numericInput("opacity", "Opacity:", value = 0.7, min = 0.1, max = 1, step = 0.1),
+                  
+                  hr(),
+                  div(class = "section-title", tags$i(class = "fas fa-map-marker"), "Legend"),
+                  selectInput("legend_position", "Legend Position:", choices = c("Bottom" = "bottom", "Top" = "top", "Right" = "right", "Left" = "left"), selected = "bottom"),
                   
                   hr(),
                   actionButton("create_chart", "Create Chart", icon = icon("chart-line"), class = "btn-primary btn-success btn-block"),
