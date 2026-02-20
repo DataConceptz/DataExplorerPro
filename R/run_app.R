@@ -2,9 +2,6 @@
 #'
 #' Opens the interactive data exploration studio in a new RStudio viewer pane or window.
 #'
-#' @param port Port for Shiny server (default: chosen by Shiny)
-#' @param host Host address (default: chosen by Shiny based on environment)
-#' @param browser Whether to open in external browser (default: FALSE)
 #' @param ... Additional arguments passed to shiny::runApp
 #'
 #' @return Invisibly returns NULL
@@ -13,15 +10,12 @@
 #' \dontrun{
 #' # Launch the add-in
 #' run_app()
-#'
-#' # Launch in external browser
-#' run_app(browser = TRUE)
 #' }
 #'
 #' @export
-run_app <- function(port = getOption("shiny.port"), host = getOption("shiny.host", "0.0.0.0"), browser = FALSE, ...) {
+run_app <- function(...) {
 
-  # Find the app directory
+  # Find the installed app directory
   app_dir <- system.file("app", package = "DataExplorerPro")
 
   # Fallback: development directory (when running from source)
@@ -35,16 +29,11 @@ run_app <- function(port = getOption("shiny.port"), host = getOption("shiny.host
          '  remotes::install_github("DataConceptz/DataExplorerPro")')
   }
 
-  message("Loading app files from: ", app_dir)
+  message("Launching DataExplorerPro from: ", app_dir)
 
-  # Build runApp args — only pass port/host when explicitly provided
-  run_args <- list(appDir = app_dir, launch.browser = browser, ...)
-  if (!is.null(port)) run_args$port <- port
-  if (!is.null(host)) run_args$host <- host
-
-  do.call(shiny::runApp, run_args)
-
-  return(invisible(NULL))
+  # Let Shiny handle host, port, and browser/viewer automatically.
+  # This works on local RStudio, Posit Cloud, and RStudio Server.
+  shiny::runApp(appDir = app_dir, launch.browser = TRUE, ...)
 }
 
 #' DataExplorerPro Add-in
