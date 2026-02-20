@@ -848,12 +848,11 @@ server <- function(input, output, session) {
     updateNumericInput(session, "opacity", value = settings$default_opacity)
     updateNumericInput(session, "temperature", value = settings$temperature)
     updateNumericInput(session, "max_tokens", value = settings$max_tokens)
-    updateSelectInput(
-      session,
-      "sample_nlp_query",
-      choices = build_context_aware_sample_questions(global_data$data),
-      selected = ""
-    )
+    tryCatch({
+      updateSelectInput(session, "sample_nlp_query", choices = build_context_aware_sample_questions(global_data$data), selected = "")
+    }, error = function(e) {
+      showNotification(paste("Error updating sample questions:", e$message), type = "error")
+    })
   }, once = TRUE)
 
   # Keep server-side theme setting synchronized with header theme switcher/localStorage
@@ -1535,6 +1534,16 @@ server <- function(input, output, session) {
     })
   })
   
+  # Reactive update of sample questions when data changes
+  observe({
+    req(global_data$data)
+    tryCatch({
+      updateSelectInput(session, "sample_nlp_query", choices = build_context_aware_sample_questions(global_data$data), selected = "")
+    }, error = function(e) {
+      showNotification(paste("Error updating sample questions:", e$message), type = "error")
+    })
+  })
+  
   # Get sample data
   get_sample_data <- function(dataset_name) {
     result <- switch(dataset_name,
@@ -2083,6 +2092,8 @@ server <- function(input, output, session) {
       p <- tryCatch(p %>% layout(
         margin = list(l = 55, r = 20, t = 60, b = 55),
         font = list(color = font_color),
+        xaxis = list(title = list(font = list(color = font_color)), tickfont = list(color = font_color)),
+        yaxis = list(title = list(font = list(color = font_color)), tickfont = list(color = font_color)),
         legend = legend,
         hoverlabel = list(bgcolor = "rgba(15, 23, 42, 0.9)", font = list(color = "#f8fafc"))
       ), error = function(e) p)
