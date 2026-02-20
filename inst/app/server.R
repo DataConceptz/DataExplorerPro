@@ -21,6 +21,15 @@ library(rlang)
 # Functions used below are provided by the DataExplorerPro namespace.
 # Do not source relative ../../R files here: that path is not valid after install.
 
+# Access non-exported performance helpers directly from package namespace.
+# This prevents runtime failures when server.R executes via shiny::runApp(appDir=...).
+if (!exists("get_analysis_data", mode = "function")) {
+  get_analysis_data <- getFromNamespace("get_analysis_data", "DataExplorerPro")
+}
+if (!exists("profile_expr", mode = "function")) {
+  profile_expr <- getFromNamespace("profile_expr", "DataExplorerPro")
+}
+
 # Helper function to check Ollama and get models
 check_ollama_status <- function() {
   tryCatch({
